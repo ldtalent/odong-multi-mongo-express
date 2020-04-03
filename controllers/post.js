@@ -79,20 +79,13 @@ exports.update = function (req, res) {
   const newAuthorId = req.params.authorId,
     postId = req.params.postId,
     newPost = req.body;
-  console.log(newAuthorId, postId, newPost)
-
-  console.log(newAuthorId, postId)
 
   postModel.findOne({ "_id": postId }, (err, post) => {
     if (!post) {
       return err;
     }
 
-    console.log(post)
-
     const oldAuthorID = post.author._id;
-
-    console.log(oldAuthorID)
 
     authorModel.findById(oldAuthorID)
       .then((oldAuthor) => {
@@ -113,19 +106,22 @@ exports.update = function (req, res) {
         });
       });
 
-    /* New Author */
+
     authorModel.findById(newAuthorId)
       .then((newAuthor) => {
         if (!newAuthor) {
           return err;
         }
-        newAuthor.posts.push(newPost);
-        newAuthor.save((err) => {
+
+        newAuthor.posts.push(post);
+        newAuthor.save(err => {
           if (err) {
             return err;
           }
         });
-        newPost.author = newAuthor;
+
+        post.author = newAuthor;
+
         _.merge(post, newPost);
         post.save((err, saved) => {
           if (err) {
