@@ -3,10 +3,12 @@ const express = require("express"),
   mongoose = require("mongoose"),
   app = express();
 
+
+mongoose.connect('mongodb://localhost:27017/Posts');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://localhost:27017/Posts', { useNewUrlParser: true });
 
 const authorRouter = require("./Views/author");
 const postRouter = require("./Views/posts");

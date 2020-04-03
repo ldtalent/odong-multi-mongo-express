@@ -4,19 +4,18 @@ const postModel = require("../models/posts");
 const _ = require("lodash");
 
 exports.params = async function (req, res, next, id) {
+  console.log(id)
   await postModel.findById(id)
     .populate("author")
     .exec()
     .then((post) => {
       if (!post) {
-        res.status(400).send("No post with that Particular id");
+        res.status(400).send(" post with that Particular id");
       } else {
         req.post = post;
         next();
       }
-    }, (err) => {
-      res.status(400).send("No post with that Particular id");
-
+    }).catch(err => {
       res.send(err);
     });
 };
@@ -80,12 +79,20 @@ exports.update = function (req, res) {
   const newAuthorId = req.params.authorId,
     postId = req.params.postId,
     newPost = req.body;
+  console.log(newAuthorId, postId, newPost)
+
+  console.log(newAuthorId, postId)
 
   postModel.findOne({ "_id": postId }, (err, post) => {
     if (!post) {
       return err;
     }
+
+    console.log(post)
+
     const oldAuthorID = post.author._id;
+
+    console.log(oldAuthorID)
 
     authorModel.findById(oldAuthorID)
       .then((oldAuthor) => {
