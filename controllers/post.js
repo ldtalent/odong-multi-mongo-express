@@ -22,7 +22,7 @@ exports.params = async function (req, res, next, id) {
 
 exports.get = async function (req, res) {
   await postModel.find({})
-    .populate("post")
+    .populate("author")
     .exec()
     .then((posts) => {
       res.json(posts);
@@ -46,6 +46,7 @@ exports.delete = async function (req, res) {
     }
   });
 };
+
 
 exports.post = async function (req, res) {
 

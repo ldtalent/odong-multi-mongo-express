@@ -23,13 +23,16 @@ exports.params = async function (req, res, next, id) {
 };
 
 exports.get = async function (req, res) {
-  await authorModel.find({})
+  await authorModel.find({}).populate( "posts" )
+  .exec()
     .then((authors) => {
       res.json(authors);
     }, (err) => {
       res.send(err);
     });
 };
+
+
 
 exports.post = async function (req, res) {
 
