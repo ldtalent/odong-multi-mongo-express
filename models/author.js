@@ -1,37 +1,37 @@
-const mongoose = require("mongoose"),
+const mongoose = require('mongoose');
 
-  { Schema } = mongoose;
+const { Schema } = mongoose;
 
 const authorSchema = new Schema({
-  "firstName": {
-    "type": String,
-    "min": 5,
-    "required": true
+  firstName: {
+    type: String,
+    min: 5,
+    required: true,
   },
-  "lastName": {
-    "type": String,
-    "min": 5,
-    "required": true
+  lastName: {
+    type: String,
+    min: 5,
+    required: true,
   },
-  "password": {
-    "type": String,
-    "min": 5,
-    "required": true
+  password: {
+    type: String,
+    min: 5,
+    required: true,
   },
-  "email": {
-    "type": String,
-    "min": 6,
-    "required": true
+  email: {
+    type: String,
+    min: 6,
+    required: true,
   },
-  "posts": [
+  posts: [
     {
-      "type": Schema.Types.ObjectId,
-      "ref": "posts"
-    }
-  ]
+      type: Schema.Types.ObjectId,
+      ref: 'posts',
+    },
+  ],
 }, {
-  "usePushEach": true
+  usePushEach: true,
 });
 
 
-module.exports = mongoose.model("authors", authorSchema);
+module.exports = mongoose.model('authors', authorSchema);

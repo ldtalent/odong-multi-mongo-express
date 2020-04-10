@@ -1,28 +1,28 @@
 
-const authorModel = require("../models/author");
-const postModel = require("../models/posts");
-const _ = require("lodash");
+const _ = require('lodash');
+const AuthorModel = require('../models/author');
+const PostModel = require('../models/posts');
 
 exports.params = async function (req, res, next, id) {
-  console.log(id)
-  await postModel.findById(id)
-    .populate("author")
+  console.log(id);
+  await PostModel.findById(id)
+    .populate('author')
     .exec()
     .then((post) => {
       if (!post) {
-        res.status(400).send(" post with that Particular id");
-      } else {
-        req.post = post;
-        next();
+        return res.status(400).send(' post with that Particular id');
       }
-    }).catch(err => {
+      req.post = post;
+      next();
+    })
+    .catch((err) => {
       res.send(err);
     });
 };
 
 exports.get = async function (req, res) {
-  await postModel.find({})
-    .populate("author")
+  await PostModel.find({})
+    .populate('author')
     .exec()
     .then((posts) => {
       res.json(posts);
@@ -38,9 +38,9 @@ exports.getOne = async function (req, res) {
 };
 
 exports.delete = async function (req, res) {
-  await postModel.remove((req.post), (err, removed) => {
+  await PostModel.remove((req.post), (err, removed) => {
     if (err) {
-      res.status(400).send("post not deleted");
+      res.status(400).send('post not deleted');
     } else {
       res.json(removed);
     }
@@ -49,87 +49,91 @@ exports.delete = async function (req, res) {
 
 
 exports.post = async function (req, res) {
+  const authorId = await req.params.authorID;
+  const postObject = await req.body;
+  const newPost = new PostModel(postObject);
 
-  const authorId = await req.params.authorID,
-    postObject = await req.body,
-    newPost = new postModel(postObject);
-
-  await authorModel.findOne({ "_id": authorId }, async (err, foundAuthor) => {
+  await AuthorModel.findOne({ _id: authorId }, async (err, foundAuthor) => {
     if (!foundAuthor) {
       return err;
     }
     foundAuthor.posts.push(newPost);
     newPost.author = foundAuthor;
-    await newPost.save((err, savedPost) => {
-      if (err) {
-        return err;
+    await newPost.save((error, savedPost) => {
+      if (error) {
+        return error;
       }
-      res.json(savedPost);
+      return res.json(savedPost);
     });
-    await foundAuthor.save((err) => {
-      if (err) {
-        return err;
+    await foundAuthor.save((error, savedAuthor) => {
+      if (error) {
+        return error;
       }
+      return res.json(savedAuthor);
     });
+    return foundAuthor;
   });
-
 };
 
 exports.update = function (req, res) {
+  const newAuthorId = req.params.authorId;
+  const { postId } = req.params;
+  const newPost = req.body;
 
-  const newAuthorId = req.params.authorId,
-    postId = req.params.postId,
-    newPost = req.body;
-
-  postModel.findOne({ "_id": postId }, (err, post) => {
+  PostModel.findOne({ _id: postId }, (err, post) => {
     if (!post) {
       return err;
     }
 
     const oldAuthorID = post.author._id;
 
-    authorModel.findById(oldAuthorID)
+    AuthorModel.findById(oldAuthorID)
       .then((oldAuthor) => {
         if (!oldAuthor) {
-          return res.status(400).send("No Author with that Particular id");
+          return res.status(400).send('No Author with that Particular id');
         }
 
-        let index = oldAuthor.posts.indexOf(postId);
+        const index = oldAuthor.posts.indexOf(postId);
 
         if (index > -1) {
           oldAuthor.posts.splice(index, 1);
         }
 
-        oldAuthor.save((err) => {
-          if (err) {
-            return err;
+        oldAuthor.save((error, savedAuthor) => {
+          if (error) {
+            return error;
           }
+          return savedAuthor;
         });
+        return oldAuthor;
       });
 
 
-    authorModel.findById(newAuthorId)
+    AuthorModel.findById(newAuthorId)
       .then((newAuthor) => {
         if (!newAuthor) {
           return err;
         }
 
         newAuthor.posts.push(post);
-        newAuthor.save(err => {
-          if (err) {
-            return err;
+        newAuthor.save((error, savedAuthor) => {
+          if (error) {
+            return error;
           }
+          return savedAuthor;
         });
 
         post.author = newAuthor;
 
         _.merge(post, newPost);
-        post.save((err, saved) => {
-          if (err) {
-            return err;
+        post.save((error, saved) => {
+          if (error) {
+            return error;
           }
-          res.json(saved);
+          return res.json(saved);
         });
+        return newAuthor;
       });
+    return post;
   });
 };
