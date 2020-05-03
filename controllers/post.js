@@ -69,7 +69,7 @@ exports.post = async function (req, res) {
       if (error) {
         return error;
       }
-      return res.json(savedAuthor);
+      savedAuthor;
     });
     return foundAuthor;
   });
@@ -116,6 +116,7 @@ exports.update = function (req, res) {
         }
 
         newAuthor.posts.push(post);
+
         newAuthor.save((error, savedAuthor) => {
           if (error) {
             return error;
